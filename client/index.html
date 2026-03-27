@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markr</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ══ AUTH ══ -->
+<div class="view active" id="view-auth">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <svg class="logo-mark" width="32" height="32" viewBox="0 0 48 48" fill="none">
+          <rect x="1" y="1" width="46" height="46" rx="10" fill="#191918" stroke="#2e2e2c" stroke-width="1"/>
+          <line class="dim" x1="12" y1="17" x2="36" y2="17" stroke-width="1.5" stroke-linecap="round"/>
+          <line class="dim" x1="12" y1="24" x2="36" y2="24" stroke-width="1.5" stroke-linecap="round"/>
+          <line class="dim" x1="12" y1="31" x2="36" y2="31" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="17" x2="36" y2="17" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="24" x2="23" y2="24" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="31" x2="18" y2="31" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M26 21.5L30 25.5L37 17" class="check" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-size:20px;font-weight:600;letter-spacing:0.05em;color:var(--text)">markr</span>
+      </div>
+      <p class="auth-tagline">AI harness for rubric-based grading.<br>Consistent scores, every submission.</p>
+      <div class="auth-error" id="auth-error"></div>
+
+      <div class="auth-form" id="form-login">
+        <div class="auth-form-group">
+          <label class="form-label">Email</label>
+          <input class="input" type="email" id="login-email" placeholder="you@university.edu"/>
+        </div>
+        <div class="auth-form-group">
+          <label class="form-label">Password</label>
+          <input class="input" type="password" id="login-pw" placeholder="••••••••"/>
+        </div>
+        <button class="btn btn-primary" onclick="doLogin()" style="width:100%;justify-content:center;padding:10px">Sign in</button>
+      </div>
+
+      <div class="auth-form" id="form-register" style="display:none">
+        <div class="auth-form-group">
+          <label class="form-label">Full name</label>
+          <input class="input" type="text" id="reg-name" placeholder="Your name"/>
+        </div>
+        <div class="auth-form-group">
+          <label class="form-label">Email</label>
+          <input class="input" type="email" id="reg-email" placeholder="you@university.edu"/>
+        </div>
+        <div class="auth-form-group">
+          <label class="form-label">Password</label>
+          <input class="input" type="password" id="reg-pw" placeholder="Min. 8 characters"/>
+        </div>
+        <button class="btn btn-primary" onclick="doRegister()" style="width:100%;justify-content:center;padding:10px">Create account</button>
+      </div>
+
+      <div class="auth-switch" id="sw-register">No account? <a onclick="switchAuth('register')">Sign up</a></div>
+      <div class="auth-switch" id="sw-login" style="display:none">Have an account? <a onclick="switchAuth('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ THREAD LIST ══ -->
+<div class="view" id="view-list">
+  <nav class="nav">
+    <div class="logo">
+      <svg class="logo-mark" width="22" height="22" viewBox="0 0 48 48" fill="none">
+        <rect x="1" y="1" width="46" height="46" rx="10" fill="#191918" stroke="#2e2e2c" stroke-width="1"/>
+        <line class="dim" x1="12" y1="17" x2="36" y2="17" stroke-width="1.5" stroke-linecap="round"/>
+        <line class="dim" x1="12" y1="24" x2="36" y2="24" stroke-width="1.5" stroke-linecap="round"/>
+        <line class="dim" x1="12" y1="31" x2="36" y2="31" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="17" x2="36" y2="17" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="24" x2="23" y2="24" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="31" x2="18" y2="31" stroke="#efefed" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M26 21.5L30 25.5L37 17" class="check" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="logo-word">markr</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-username"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sign out</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal()">+ New thread</button>
+    </div>
+  </nav>
+  <div class="list-body">
+    <div class="list-top">
+      <div>
+        <div class="list-heading">Grading threads</div>
+        <div class="list-sub">Select a thread to grade submissions</div>
+      </div>
+    </div>
+    <div class="thread-grid" id="thread-grid"></div>
+  </div>
+</div>
+
+<!-- ══ THREAD PAGE ══ -->
+<div class="view" id="view-thread">
+  <nav class="thread-nav">
+    <div class="thread-nav__left">
+      <button class="btn btn-ghost btn-sm" onclick="goList()">← Back</button>
+    </div>
+    <div class="thread-nav__center">
+      <div class="thread-nav__name" id="thread-nav-name"></div>
+    </div>
+    <div class="thread-nav__right">
+      <button class="btn btn-ghost btn-sm" onclick="toggleSidebar()">History</button>
+    </div>
+  </nav>
+  <div class="thread-body">
+    <div class="thread-main">
+
+      <div class="rubric-panel" id="rubric-panel">
+        <div class="rubric-panel__header" onclick="toggleRubric()">
+          <div class="rubric-panel__left">
+            <span class="rubric-panel__title">Rubric</span>
+            <span class="badge badge-locked">locked</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="rubric-toggle-btn" style="pointer-events:none">Show</button>
+        </div>
+        <div id="rubric-body" style="display:none">
+          <div class="rubric-panel__body">
+            <div id="rubric-criteria-list"></div>
+            <div class="rubric-footer">
+              <span class="rubric-total" id="rubric-total"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grading-box">
+        <span class="grading-box__label">Paste submission</span>
+        <textarea class="textarea" id="submission-text" placeholder="Paste the student's submission here..."></textarea>
+        <div class="grading-box__footer">
+          <span class="grading-box__hint">One AI call per criterion · Saved automatically</span>
+          <button class="btn btn-primary" id="grade-btn" onclick="gradeSubmission()">Grade submission</button>
+        </div>
+      </div>
+
+      <div id="result-area"></div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Past gradings</span>
+        <button class="btn btn-icon" onclick="toggleSidebar()" style="font-size:14px">✕</button>
+      </div>
+      <div class="sidebar-body" id="sidebar-body"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">New grading thread</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="form-label">Thread name</label>
+        <input class="input" id="modal-name" type="text" placeholder="e.g. COMP101 — Week 3 Essays"/>
+      </div>
+      <div>
+        <label class="form-label">Rubric text</label>
+        <div class="parse-box">
+          <div class="parse-box__note">Paste your rubric below. Markr will extract the criteria. Review before locking.</div>
+          <textarea class="textarea" id="rubric-paste" rows="5" placeholder="e.g. Argument Quality (20pts): The essay presents a clear, well-supported argument...&#10;&#10;Evidence (15pts): Sources are credible and cited effectively..."></textarea>
+          <div class="parse-box__actions">
+            <button class="btn btn-secondary btn-sm" onclick="parseRubric()">Parse rubric →</button>
+          </div>
+        </div>
+      </div>
+      <div class="parsed-preview" id="parsed-preview">
+        <div class="parsed-preview__label">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#3ecf8e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Criteria parsed — review before locking
+        </div>
+        <div id="parsed-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="confirm-btn" disabled onclick="createThread()">Confirm & lock thread</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

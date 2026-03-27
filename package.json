@@ -1,0 +1,14 @@
+{
+  "name": "markr",
+  "version": "1.0.0",
+  "description": "AI-powered submission grading",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "smoke:google": "node server/ai.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.0"
+  }
+}
