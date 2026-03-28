@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "smoke:google": "node server/ai.js"
+    "ai": "node --env-file=.env.local server/ai.js"
   },
   "dependencies": {
+    "groq-sdk": "^1.1.2",
     "pg": "^8.11.0"
   }
 }
