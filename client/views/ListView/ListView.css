@@ -1,0 +1,4 @@
+.list-body{flex:1;overflow-y:auto;padding:28px 24px;background:var(--bg-subtle)}
+.list-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+.list-heading{font-size:18px;font-weight:var(--fw-semibold);letter-spacing:-0.02em;line-height:1.2}
+.list-sub{font-size:13px;color:var(--text-3);margin-top:3px}

@@ -1,0 +1,54 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --font:'Outfit',sans-serif;
+  --fw-light:300;
+  --fw-regular:400;
+  --fw-medium:500;
+  --fw-semibold:600;
+
+  /* Backgrounds */
+  --bg:#0a0a09;
+  --bg-subtle:#111110;
+  --bg-surface:#191918;
+  --bg-inset:#202020;
+  --bg-raised:#252523;
+
+  /* Borders */
+  --border:#232321;
+  --border-mid:#2e2e2c;
+  --border-strong:#3a3a38;
+
+  /* Text */
+  --text:#efefed;
+  --text-2:#9a9a96;
+  --text-3:#4e4e4c;
+  --text-4:#2e2e2c;
+
+  /* Accent — teal */
+  --accent:#2ec4b6;
+  --accent-dim:rgba(46,196,182,0.1);
+  --accent-hover:#25a89b;
+  --accent-fg:#0a0a09;
+
+  /* Semantic */
+  --success:#3ecf8e;
+  --success-dim:rgba(62,207,142,0.09);
+  --warning:#f5a623;
+  --warning-dim:rgba(245,166,35,0.09);
+  --danger:#f06f6f;
+  --danger-dim:rgba(240,111,111,0.09);
+
+  /* Radii */
+  --r-xs:4px;
+  --r-sm:7px;
+  --r-md:10px;
+  --r-lg:14px;
+  --r-xl:18px;
+  --r-full:999px;
+
+  /* Layout */
+  --nav-h:54px;
+  --sidebar-w:296px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}

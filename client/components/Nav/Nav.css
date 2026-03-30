@@ -1,0 +1,8 @@
+.nav{
+  height:var(--nav-h);min-height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg);
+}
+.nav-right{display:flex;align-items:center;gap:6px}
