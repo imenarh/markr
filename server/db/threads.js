@@ -4,7 +4,7 @@ export async function getThreads() {
   const { rows } = await pool.query(`
     SELECT t.*, r.criteria, r.max_score
     FROM threads t
-    LEFT JOIN rubric r ON r.thread_id = t.id
+    LEFT JOIN rubrics r ON r.thread_id = t.id
     ORDER BY t.created_at DESC
   `);
   return rows;
@@ -14,23 +14,23 @@ export async function getThread(id) {
   const { rows } = await pool.query(`
     SELECT t.*, r.criteria, r.max_score
     FROM threads t
-    LEFT JOIN rubric r ON r.thread_id = t.id
+    LEFT JOIN rubrics r ON r.thread_id = t.id
     WHERE t.id = $1
   `, [id]);
   return rows[0] ?? null;
 }
 
-export async function createThread(name) {
+export async function createThread(name, user_id) {
   const { rows } = await pool.query(
-    'INSERT INTO threads (name) VALUES ($1) RETURNING *',
-    [name]
+    'INSERT INTO threads (name, user_id) VALUES ($1, $2) RETURNING *',
+    [name, user_id]
   );
   return rows[0];
 }
 
 export async function createRubric(threadId, criteria, maxScore) {
   const { rows } = await pool.query(
-    'INSERT INTO rubric (thread_id, criteria, max_score) VALUES ($1, $2, $3) RETURNING *',
+    'INSERT INTO rubrics (thread_id, criteria, max_score) VALUES ($1, $2, $3) RETURNING *',
     [threadId, JSON.stringify(criteria), maxScore]
   );
   return rows[0];

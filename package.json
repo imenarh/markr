@@ -4,8 +4,7 @@
   "description": "AI-powered submission grading",
   "type": "module",
   "scripts": {
-    "start": "node server/index.js",
-    "ai": "node --env-file=.env.local server/ai.js"
+    "start": "node --env-file=.env.local server/index.js"
   },
   "dependencies": {
     "groq-sdk": "^1.1.2",
