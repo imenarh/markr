@@ -2,13 +2,13 @@
 
 A web-based AI grading tool. Paste a rubric, paste a submission, get structured scores and feedback for each criterion — consistent every time.
 
-> Built for teachers and TAs who grade the same rubric repeatedly and want fast, consistent, AI-assisted feedback.
+> Built for user who want decent AI-powered submission feedback.
 
 ## How it works
 
 - Create a grading thread and paste your rubric — Markr uses AI to parse it into structured criteria automatically
 - The rubric is locked once the thread is created
-- Paste any student submission and click Grade — the AI evaluates the full submission against all criteria in one call and returns a score and feedback per criterion
+- Paste any assigment submission and click Grade — the AI evaluates the full submission against all criteria in one call and returns a score and feedback per criterion
 - Results are saved to the thread and viewable in the history sidebar
 
 ## APIs used
@@ -18,7 +18,7 @@ A web-based AI grading tool. Paste a rubric, paste a submission, get structured 
   - `llama-3.3-70b-versatile` for grading (more accurate, consistent with `temperature: 0`)
 - **[Neon](https://neon.tech/docs/introduction)** — serverless PostgreSQL used to persist threads, rubrics, and grading results
 
-API keys are stored in a `.env` file and are never committed to the repository. See setup instructions below.
+API keys are stored in a `.env` file. See setup instructions below.
 
 ## Running locally
 
@@ -31,10 +31,10 @@ npm install
 Create a `.env.local` file in the project root:
 
 ```
-DATABASE_URL=your_neon_connection_string
+DATABASE_URL=a_postgress_connection_string
 GROQ_API_KEY=your_groq_api_key
 HOST=127.0.0.1
-PORT=3001
+PORT=3000
 ```
 
 Then start the server:
@@ -136,7 +136,7 @@ Required GitHub secrets: `WEB01_HOST`, `WEB02_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_
 ## Challenges
 
 - **IPv6 connectivity in WSL2** — the `pg` driver tried to connect to Neon over IPv6, which WSL2 doesn't route reliably. Fixed locally by appending `?family=4` to `DATABASE_URL` to force IPv4. Not needed on the VPS servers.
-- **AI output consistency** — early testing showed different scores for the same submission across runs. Switched to `temperature: 0` and `llama-3.3-70b-versatile` for stable, deterministic grading.
+- **AI output consistency** — early testing with `openai/gpt-oss-120b`gave different scores for the same submission across runs. Switched to `temperature: 0` and `llama-3.3-70b-versatile` for stable, deterministic grading.
 - **AI schema drift** — the 8B parse model occasionally returned `max_points` as a string instead of a number. Fixed by normalizing parsed criteria on the server before returning them to the client.
 
 ## Credits

@@ -20,7 +20,7 @@ export function init() {
           <div>
             <label class="form-label">Rubric text</label>
             <div class="parse-box">
-              <div class="parse-box__note">Paste your rubric below. Markr will extract the criteria. Review before locking.</div>
+              <div class="parse-box__note">Paste your rubric below. Markr will extract the criteria. Review before confirming.</div>
               <textarea class="textarea" id="rubric-paste" rows="5" placeholder="e.g. Argument Quality (20pts): The essay presents a clear, well-supported argument...&#10;&#10;Evidence (15pts): Sources are credible and cited effectively..."></textarea>
               <div class="parse-box__actions">
                 <button class="btn btn-secondary btn-sm" id="parse-btn">Parse rubric →</button>
@@ -32,14 +32,14 @@ export function init() {
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6L5 9L10 3" stroke="#3ecf8e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Criteria parsed — review before locking
+              Criteria parsed — review before confirming
             </div>
             <div id="parsed-list"></div>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-ghost btn-sm" id="modal-cancel-btn">Cancel</button>
-          <button class="btn btn-primary btn-sm" id="confirm-btn" disabled>Confirm & lock thread</button>
+          <button class="btn btn-primary btn-sm" id="confirm-btn" disabled>Create thread</button>
         </div>
       </div>
     </div>

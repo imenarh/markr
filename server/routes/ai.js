@@ -6,8 +6,8 @@ export async function handleGrade(req) {
   try {
     const { thread_id, submission, criteria } = req.body;
 
-    if (!submission || !criteria?.length) {
-      return { status: 400, body: { error: 'submission and criteria are required' } };
+    if (!thread_id || !submission || !criteria?.length) {
+      return { status: 400, body: { error: 'thread_id, submission and criteria are required' } };
     }
 
     // Build the message sent to Groq
@@ -38,6 +38,10 @@ ${submission}`;
       grade,
       gradeResult.feedback
     );
+
+    if (!saved?.id) {
+      throw new Error('Result insert did not return a row');
+    }
 
     return { status: 200, body: saved };
   } catch (err) {

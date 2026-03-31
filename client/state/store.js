@@ -25,16 +25,40 @@ export function normalizeThread(t) {
   };
 }
 
+function parseScores(rawScores) {
+  if (Array.isArray(rawScores)) return rawScores;
+  if (typeof rawScores !== 'string') return [];
+
+  try {
+    const parsed = JSON.parse(rawScores);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeScore(score) {
+  return {
+    name: score?.name ?? '',
+    points: Number(score?.points ?? score?.score ?? score?.grade ?? 0),
+    max_points: Number(score?.max_points ?? score?.maxScore ?? score?.max ?? 0),
+    feedback: score?.feedback ?? '',
+  };
+}
+
 // Converts a result row from the API into the shape components expect
 export function normalizeResult(r) {
   const now = new Date(r.created_at);
+  const scores = parseScores(r.scores).map(normalizeScore);
+  const grade = Number(r.grade ?? scores.reduce((sum, s) => sum + s.points, 0));
+
   return {
     id: r.id,
     date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    grade: r.grade,
-    max_grade: r.scores.reduce((sum, s) => sum + s.max_points, 0),
+    grade,
+    max_grade: scores.reduce((sum, s) => sum + s.max_points, 0),
     feedback: r.overall_feedback,
-    scores: r.scores,
+    scores,
   };
 }

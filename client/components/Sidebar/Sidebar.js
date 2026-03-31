@@ -7,14 +7,9 @@ export function init(container, thread) {
   _open = false;
   container.innerHTML = `
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <span class="sidebar-title">Past gradings</span>
-        <button class="btn btn-ghost" id="sidebar-close-btn" style="font-size:14px">✕</button>
-      </div>
       <div class="sidebar-body" id="sidebar-body"></div>
     </div>
   `;
-  $('sidebar-close-btn').addEventListener('click', close);
   render(thread);
 }
 
@@ -27,7 +22,7 @@ export function render(thread) {
     return;
   }
 
-  body.innerHTML = [...thread.results].reverse().map(r => `
+  body.innerHTML = thread.results.map(r => `
     <div class="sb-item">
       <div class="sb-item-head" data-rid="${r.id}">
         <div class="sb-item-score">${r.grade} / ${r.max_grade} pts</div>

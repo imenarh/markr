@@ -10,10 +10,7 @@ let _thread = null;
 export async function init(container, thread, onBack) {
   _thread = thread;
 
-  // Load past results from DB
-  const res = await fetch(`/api/threads/${thread.id}/results`);
-  const data = await res.json();
-  _thread.results = data.map(normalizeResult);
+  await refreshResults();
 
   container.innerHTML = `
     <nav class="thread-nav">
@@ -23,33 +20,52 @@ export async function init(container, thread, onBack) {
       <div class="thread-nav__center">
         <div class="thread-nav__name">${thread.name}</div>
       </div>
-      <div class="thread-nav__right">
-        <button class="btn btn-ghost btn-sm" id="history-btn">History</button>
-      </div>
+      <div class="thread-nav__right"></div>
     </nav>
     <div class="thread-body">
-      <div class="thread-main">
-        <div id="rubric-container"></div>
-        <div class="grading-box">
-          <span class="grading-box__label">Paste submission</span>
-          <textarea class="textarea" id="submission-text" placeholder="Paste the student's submission here..."></textarea>
-          <div class="grading-box__footer">
-            <span class="grading-box__hint">One AI call per criterion · Saved automatically</span>
-            <button class="btn btn-primary" id="grade-btn">Grade submission</button>
-          </div>
+      <div class="thread-left">
+        <textarea class="submission-textarea" id="submission-text" placeholder="Paste the submission here..."></textarea>
+        <div class="thread-left__footer">
+          <button class="btn btn-primary" id="grade-btn">Grade submission</button>
         </div>
-        <div id="result-area"></div>
       </div>
-      <div id="sidebar-container"></div>
+      <div class="thread-right">
+        <div class="right-tabs">
+          <button class="right-tab right-tab--active" id="tab-rubric">Rubric</button>
+          <button class="right-tab" id="tab-history">History</button>
+        </div>
+        <div class="right-pane" id="pane-rubric">
+          <div id="result-area"></div>
+          <div id="rubric-container"></div>
+        </div>
+        <div class="right-pane" id="pane-history" style="display:none">
+          <div id="sidebar-container"></div>
+        </div>
+      </div>
     </div>
   `;
 
   $('back-btn').addEventListener('click', onBack);
-  $('history-btn').addEventListener('click', Sidebar.toggle);
   $('grade-btn').addEventListener('click', grade);
+  $('tab-rubric').addEventListener('click', () => showTab('rubric'));
+  $('tab-history').addEventListener('click', () => showTab('history'));
 
   RubricPanel.init($('rubric-container'), thread);
   Sidebar.init($('sidebar-container'), thread);
+}
+
+function showTab(name) {
+  $('pane-rubric').style.display = name === 'rubric' ? '' : 'none';
+  $('pane-history').style.display = name === 'history' ? '' : 'none';
+  $('tab-rubric').classList.toggle('right-tab--active', name === 'rubric');
+  $('tab-history').classList.toggle('right-tab--active', name === 'history');
+}
+
+async function refreshResults() {
+  const res = await fetch(`/api/threads/${_thread.id}/results`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || 'Failed to load results');
+  _thread.results = data.map(normalizeResult);
 }
 
 async function grade() {
@@ -60,30 +76,29 @@ async function grade() {
   btn.disabled = true;
   btn.textContent = 'Grading...';
 
+  showTab('rubric');
+
   try {
-    // Run progress animation and API call in parallel
-    const [apiData] = await Promise.all([
-      fetch('/api/grade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          thread_id: _thread.id,
-          submission: txt,
-          criteria: _thread.criteria.map(c => ({ name: c.name, description: c.description, max_points: c.max_points })),
-        }),
-      }).then(r => r.json()),
-      new Promise(resolve => ResultCard.showProgress($('result-area'), _thread.criteria, resolve)),
-    ]);
+    const res = await fetch('/api/grade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        thread_id: _thread.id,
+        submission: txt,
+        criteria: _thread.criteria.map(c => ({ name: c.name, description: c.description, max_points: c.max_points })),
+      }),
+    });
+    const apiData = await res.json();
+    if (!res.ok) throw new Error(apiData?.error || 'Grading failed');
 
     const result = normalizeResult(apiData);
-    _thread.results.push(result);
+    await refreshResults();
     ResultCard.showResult($('result-area'), result);
     Sidebar.render(_thread);
-    Sidebar.open();
     $('submission-text').value = '';
   } catch (err) {
     console.error(err);
-    alert('Grading failed. Please try again.');
+    alert(err.message || 'Grading failed. Please try again.');
   }
 
   btn.disabled = false;
