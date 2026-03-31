@@ -1,0 +1,34 @@
+name: Deploying Markr
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to ${{ matrix.label }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - host_secret: WEB01_HOST
+            label: web01
+          - host_secret: WEB02_HOST
+            label: web02
+
+    steps:
+      - name: Deploy to ${{ matrix.label }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets[matrix.host_secret] }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            cd /var/www/markr
+            git pull origin main
+            npm install --omit=dev
+            pm2 reload ecosystem.config.cjs --update-env
