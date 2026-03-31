@@ -1,5 +1,5 @@
 import { injectCSS, $ } from '../../utils.js';
-import { state } from '../../state/store.js';
+import { state, normalizeThread } from '../../state/store.js';
 injectCSS('/components/Modal/Modal.css');
 
 let _onCreated = null;
@@ -92,19 +92,27 @@ function parseRubric() {
   $('confirm-btn').disabled = false;
 }
 
-function createThread() {
+async function createThread() {
   const name = $('modal-name').value.trim();
   if (!name) { alert('Please enter a thread name.'); return; }
   if (!state.parsed.length) { alert('Please parse a rubric first.'); return; }
 
-  const thread = {
-    id: state.threads.length + 1,
-    name,
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    criteria: state.parsed.map((c, i) => ({ id: i + 1, ...c })),
-    results: []
-  };
+  const maxScore = state.parsed.reduce((sum, c) => sum + c.pts, 0);
 
+  const res = await fetch('/api/threads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      rubric: {
+        criteria: state.parsed.map(c => ({ name: c.name, description: c.desc, max_points: c.pts })),
+        max_score: maxScore,
+      },
+    }),
+  });
+
+  const data = await res.json();
+  const thread = normalizeThread({ ...data.new_thread, criteria: data.new_rubric.criteria });
   state.threads.unshift(thread);
   close();
   _onCreated?.(thread);

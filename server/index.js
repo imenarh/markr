@@ -4,7 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleGrade } from './routes/ai.js';
-import { handleGetThreads, handleCreateThread } from './routes/threads.js';
+import { handleGetThreads, handleCreateThread, handleGetResults } from './routes/threads.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,12 +34,16 @@ const server = http.createServer(async (req, res) => {
 
   // ── API ──
   if (pathname.startsWith('/api/')) {
+    // Match static routes first, then pattern routes like /api/threads/:id/results
     const route = API_ROUTES.find(([m, p]) => m === req.method && p === pathname);
-    if (!route) return sendJson(res, 404, { error: 'Not found' });
+    const patternRoute = !route && matchPattern(req.method, pathname);
+    if (!route && !patternRoute) return sendJson(res, 404, { error: 'Not found' });
 
     try {
       req.body = await parseBody(req);
-      const { status, body } = await route[2](req);
+      const handler = route ? route[2] : patternRoute.handler;
+      if (patternRoute) req.params = patternRoute.params;
+      const { status, body } = await handler(req);
       sendJson(res, status, body);
     } catch (err) {
       console.error(err);
@@ -74,6 +78,20 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, host, () => {
   console.log(`Markr listening on http://${host}:${port}`);
 });
+
+// Matches routes with dynamic segments e.g. /api/threads/:id/results
+const PATTERN_ROUTES = [
+  { method: 'GET', pattern: /^\/api\/threads\/([^/]+)\/results$/, handler: handleGetResults, params: (m) => ({ id: m[1] }) },
+];
+
+function matchPattern(method, pathname) {
+  for (const r of PATTERN_ROUTES) {
+    if (r.method !== method) continue;
+    const match = pathname.match(r.pattern);
+    if (match) return { handler: r.handler, params: r.params(match) };
+  }
+  return null;
+}
 
 function sendJson(res, statusCode, body) {
   res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });

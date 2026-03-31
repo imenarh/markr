@@ -40,7 +40,7 @@ export function render() {
   grid.innerHTML = state.threads.map(t => ThreadCard(t)).join('');
   grid.querySelectorAll('.thread-card').forEach(card => {
     card.addEventListener('click', () => {
-      const thread = state.threads.find(t => t.id === Number(card.dataset.id));
+      const thread = state.threads.find(t => t.id ===card.dataset.id);
       if (thread) _handlers.onOpenThread(thread);
     });
   });

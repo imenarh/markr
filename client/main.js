@@ -1,4 +1,5 @@
-import { $ } from './utils.js';
+import { $} from './utils.js';
+import { state, normalizeThread } from './state/store.js';
 import * as ListView from './views/ListView/ListView.js';
 import * as ThreadView from './views/ThreadView/ThreadView.js';
 import * as Modal from './components/Modal/Modal.js';
@@ -10,8 +11,8 @@ ListView.init($('view-list'), {
   onOpenThread: (thread) => openThread(thread),
 });
 
-function openThread(thread) {
-  ThreadView.init($('view-thread'), thread, () => navigate('list'));
+async function openThread(thread) {
+  await ThreadView.init($('view-thread'), thread, () => navigate('list'));
   navigate('thread');
 }
 
@@ -21,4 +22,12 @@ function navigate(view) {
   if (view === 'list') ListView.render();
 }
 
-navigate('list');
+// Fetch threads from API then render
+async function init() {
+  const res = await fetch('/api/threads');
+  const data = await res.json();
+  state.threads = data.map(normalizeThread);
+  navigate('list');
+}
+
+init();

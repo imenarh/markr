@@ -1,27 +1,19 @@
 import { injectCSS, $ } from '../../utils.js';
+import { normalizeResult } from '../../state/store.js';
 import * as RubricPanel from '../../components/RubricPanel/RubricPanel.js';
 import * as ResultCard from '../../components/ResultCard/ResultCard.js';
 import * as Sidebar from '../../components/Sidebar/Sidebar.js';
 injectCSS('/views/ThreadView/ThreadView.css');
 
-// Placeholder feedback — replaced when AI grading is wired up
-const FEEDBACK = {
-  "Argument Quality": "Central argument is present and clear. The supporting reasoning could be more specific — particularly in the middle paragraphs where the claim drifts slightly.",
-  "Evidence & Sources": "Good use of cited material. Two instances where claims lack supporting evidence. Recommend adding citations to the third body paragraph.",
-  "Structure & Flow": "Well-organized overall. Introduction sets up the topic clearly. Conclusion could tie back more explicitly to the opening thesis.",
-  "Writing Clarity": "Academic tone maintained throughout. A few run-on sentences in the middle section. Grammar is generally strong.",
-  "Correctness": "Algorithm handles the main test cases. Edge case with empty input not addressed — this would cause a runtime error.",
-  "Time Complexity": "O(n log n) achieved and clearly justified. Could elaborate on why O(n²) was rejected.",
-  "Code Quality": "Well-structured and readable. Variable names are descriptive. Missing docstrings on two helper functions.",
-  "Methodology": "Setup clearly described. Control variables section needs more detail on how interference was minimized.",
-  "Data Analysis": "Quantitative analysis is solid. The anomaly in trial 3 is noted but unexplained.",
-  "Conclusion": "Findings connect well to theory. Limitations section acknowledges sample size but not potential data collection bias.",
-};
-
 let _thread = null;
 
-export function init(container, thread, onBack) {
+export async function init(container, thread, onBack) {
   _thread = thread;
+
+  // Load past results from DB
+  const res = await fetch(`/api/threads/${thread.id}/results`);
+  const data = await res.json();
+  _thread.results = data.map(normalizeResult);
 
   container.innerHTML = `
     <nav class="thread-nav">
@@ -60,7 +52,7 @@ export function init(container, thread, onBack) {
   Sidebar.init($('sidebar-container'), thread);
 }
 
-function grade() {
+async function grade() {
   const txt = $('submission-text').value.trim();
   if (!txt) { alert('Please paste a submission before grading.'); return; }
 
@@ -68,30 +60,32 @@ function grade() {
   btn.disabled = true;
   btn.textContent = 'Grading...';
 
-  ResultCard.showProgress($('result-area'), _thread.criteria, () => {
-    const scores = _thread.criteria.map(c => ({
-      n: c.name,
-      s: Math.min(c.pts, Math.round(c.pts * (0.66 + Math.random() * 0.28))),
-      m: c.pts,
-      fb: FEEDBACK[c.name] ?? "Criterion assessed. Partially meets requirements with room to improve specificity."
-    }));
-    const total = scores.reduce((a, x) => a + x.s, 0);
-    const max = scores.reduce((a, x) => a + x.m, 0);
-    const now = new Date();
-    const result = {
-      id: Date.now(),
-      date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      total, max, scores
-    };
+  try {
+    // Run progress animation and API call in parallel
+    const [apiData] = await Promise.all([
+      fetch('/api/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          thread_id: _thread.id,
+          submission: txt,
+          criteria: _thread.criteria.map(c => ({ name: c.name, description: c.desc, max_points: c.pts })),
+        }),
+      }).then(r => r.json()),
+      new Promise(resolve => ResultCard.showProgress($('result-area'), _thread.criteria, resolve)),
+    ]);
 
+    const result = normalizeResult(apiData);
     _thread.results.push(result);
     ResultCard.showResult($('result-area'), result);
     Sidebar.render(_thread);
     Sidebar.open();
+  } catch (err) {
+    console.error(err);
+    alert('Grading failed. Please try again.');
+  }
 
-    btn.disabled = false;
-    btn.textContent = 'Grade submission';
-    $('submission-text').value = '';
-  });
+  btn.disabled = false;
+  btn.textContent = 'Grade submission';
+  $('submission-text').value = '';
 }

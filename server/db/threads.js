@@ -2,9 +2,12 @@ import { pool } from './index.js';
 
 export async function getThreads() {
   const { rows } = await pool.query(`
-    SELECT t.*, r.criteria, r.max_score
+    SELECT t.*, r.criteria, r.max_score,
+      COUNT(res.id)::int AS result_count
     FROM threads t
     LEFT JOIN rubrics r ON r.thread_id = t.id
+    LEFT JOIN results res ON res.thread_id = t.id
+    GROUP BY t.id, r.criteria, r.max_score
     ORDER BY t.created_at DESC
   `);
   return rows;

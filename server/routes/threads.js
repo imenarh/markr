@@ -1,4 +1,4 @@
-import { getThreads, createThread, createRubric } from '../db/threads.js';
+import { getThreads, createThread, createRubric, getResults } from '../db/threads.js';
 
 export async function handleGetThreads() {
 	try {
@@ -10,6 +10,16 @@ export async function handleGetThreads() {
 	}
 }
 
+
+export async function handleGetResults(req) {
+  try {
+    const results = await getResults(req.params.id);
+    return { status: 200, body: results };
+  } catch (err) {
+    console.error(err);
+    return { status: 500, body: { error: 'Failed to get results' } };
+  }
+}
 
 export async function handleCreateThread(req) {
 	try {
