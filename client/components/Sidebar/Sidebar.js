@@ -9,7 +9,7 @@ export function init(container, thread) {
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title">Past gradings</span>
-        <button class="btn btn-icon" id="sidebar-close-btn" style="font-size:14px">✕</button>
+        <button class="btn btn-ghost" id="sidebar-close-btn" style="font-size:14px">✕</button>
       </div>
       <div class="sidebar-body" id="sidebar-body"></div>
     </div>

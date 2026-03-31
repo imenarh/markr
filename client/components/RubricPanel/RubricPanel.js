@@ -23,7 +23,7 @@ export function init(container, thread) {
               <div class="criterion-item">
                 <div class="criterion-item__body">
                   <div class="criterion-item__name">${c.name}</div>
-                  <div class="criterion-item__desc">${c.desc}</div>
+                  <div class="criterion-item__desc">${c.description}</div>
                 </div>
                 <div class="criterion-item__pts">${c.max_points} pts</div>
               </div>

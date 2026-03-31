@@ -80,6 +80,7 @@ async function grade() {
     ResultCard.showResult($('result-area'), result);
     Sidebar.render(_thread);
     Sidebar.open();
+    $('submission-text').value = '';
   } catch (err) {
     console.error(err);
     alert('Grading failed. Please try again.');
@@ -87,5 +88,4 @@ async function grade() {
 
   btn.disabled = false;
   btn.textContent = 'Grade submission';
-  $('submission-text').value = '';
 }

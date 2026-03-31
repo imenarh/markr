@@ -1,4 +1,4 @@
-import { getThreads, createThread, createRubric, getResults } from '../db/threads.js';
+import { getThreads, getThread, createThread, createRubric, getResults } from '../db/threads.js';
 
 export async function handleGetThreads() {
 	try {
@@ -10,6 +10,17 @@ export async function handleGetThreads() {
 	}
 }
 
+
+export async function handleGetThread(req) {
+  try {
+    const thread = await getThread(req.params.id);
+    if (!thread) return { status: 404, body: { error: 'Not found' } };
+    return { status: 200, body: thread };
+  } catch (err) {
+    console.error(err);
+    return { status: 500, body: { error: 'Failed to get thread' } };
+  }
+}
 
 export async function handleGetResults(req) {
   try {

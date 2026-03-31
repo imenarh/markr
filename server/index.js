@@ -4,7 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleGrade } from './routes/ai.js';
-import { handleGetThreads, handleCreateThread, handleGetResults } from './routes/threads.js';
+import { handleGetThreads, handleGetThread, handleCreateThread, handleGetResults } from './routes/threads.js';
 import { handleParseRubric } from './routes/parse.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,6 +54,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── Client-side routes ──
+  if (pathname.startsWith('/t/')) {
+    const filePath = path.resolve(clientDir, 'thread.html');
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    createReadStream(filePath).pipe(res);
+    return;
+  }
+
   // ── Static files ──
   if (req.method !== 'GET') return sendJson(res, 405, { error: 'Method not allowed' });
 
@@ -84,6 +92,7 @@ server.listen(port, host, () => {
 // Matches routes with dynamic segments e.g. /api/threads/:id/results
 const PATTERN_ROUTES = [
   { method: 'GET', pattern: /^\/api\/threads\/([^/]+)\/results$/, handler: handleGetResults, params: (m) => ({ id: m[1] }) },
+  { method: 'GET', pattern: /^\/api\/threads\/([^/]+)$/, handler: handleGetThread, params: (m) => ({ id: m[1] }) },
 ];
 
 function matchPattern(method, pathname) {
