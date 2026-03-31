@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleGrade } from './routes/ai.js';
 import { handleGetThreads, handleCreateThread, handleGetResults } from './routes/threads.js';
+import { handleParseRubric } from './routes/parse.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,7 @@ const MIME_TYPES = {
 // API routes: [method, path] → handler(req) → { status, body }
 const API_ROUTES = [
   ['POST', '/api/grade',          handleGrade],
+  ['POST', '/api/parse',          handleParseRubric],
   ['GET',  '/api/threads',        handleGetThreads],
   ['POST', '/api/threads',        handleCreateThread],
 ];

@@ -69,7 +69,7 @@ async function grade() {
         body: JSON.stringify({
           thread_id: _thread.id,
           submission: txt,
-          criteria: _thread.criteria.map(c => ({ name: c.name, description: c.desc, max_points: c.pts })),
+          criteria: _thread.criteria.map(c => ({ name: c.name, description: c.description, max_points: c.max_points })),
         }),
       }).then(r => r.json()),
       new Promise(resolve => ResultCard.showProgress($('result-area'), _thread.criteria, resolve)),

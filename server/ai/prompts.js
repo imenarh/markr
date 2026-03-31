@@ -14,13 +14,35 @@ When grading:
 
 Always return valid JSON in exactly this shape, nothing else:
 {
-  "criteria": [
+  "scores": [
     {
       "name": "criterion name",
-      "score": number,
+      "points": number,
       "max_points": number,
       "feedback": "2-3 specific sentences about this criterion"
     }
   ],
-  "overall": "3-4 sentences summarizing the submission's strengths and weaknesses"
+  "feedback": "3-4 sentences summarizing the submission's strengths and weaknesses"
 }`;
+
+export const parsePrompt = `You are a rubric parser. Extract grading criteria from the rubric text provided and return them as JSON.
+
+ Rules:
+ 	- do not reword, summarize, or add anything
+ 	- Extract each criterion name and its maximum points (the highest point value listed)
+  - Use the full criterion description or the top rating description as the description
+  - Points must be a number
+  - Return only valid JSON, nothing else
+ 
+
+
+ Always return this exact shape:
+ {
+   "criteria": [
+     {
+       "name": "criterion name",
+       "description": "criterion description as written",
+       "max_points": number
+     }
+   ]
+ }`;

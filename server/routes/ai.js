@@ -28,15 +28,15 @@ ${submission}`;
     const raw = response.choices[0]?.message?.content ?? '';
     const gradeResult = JSON.parse(raw);
 
-    // Calculate total score from all criteria scores
-    const totalScore = gradeResult.criteria.reduce((sum, c) => sum + c.score, 0);
+    // Calculate grade from all criteria points
+    const grade = gradeResult.scores.reduce((sum, c) => sum + c.points, 0);
 
     // Save to DB
     const saved = await createResult(
       thread_id,
-      gradeResult.criteria,
-      totalScore,
-      gradeResult.overall
+      gradeResult.scores,
+      grade,
+      gradeResult.feedback
     );
 
     return { status: 200, body: saved };

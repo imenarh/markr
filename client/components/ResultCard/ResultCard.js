@@ -39,19 +39,19 @@ export function showResult(container, result) {
     <div class="result-card">
       <div class="result-header">
         <div>
-          <span class="result-score">${result.total}</span>
-          <span class="result-score-max"> / ${result.max} pts</span>
+          <span class="result-score">${result.grade}</span>
+          <span class="result-score-max"> / ${result.max_grade} pts</span>
         </div>
         <span class="result-date">Just now</span>
       </div>
       ${result.scores.map(s => `
         <div class="result-row">
           <div class="result-row-head">
-            <span class="result-row-name">${s.n}</span>
-            <span class="result-row-pts">${s.s} / ${s.m}</span>
+            <span class="result-row-name">${s.name}</span>
+            <span class="result-row-pts">${s.points} / ${s.max_points}</span>
           </div>
-          <div class="result-row-fb">${s.fb}</div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:${Math.round(s.s / s.m * 100)}%"></div></div>
+          <div class="result-row-fb">${s.feedback}</div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${Math.round(s.points / s.max_points * 100)}%"></div></div>
         </div>
       `).join('')}
     </div>

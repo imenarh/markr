@@ -25,7 +25,7 @@ export async function handleCreateThread(req) {
 	try {
 	const { user_id, name, rubric } = req.body;
 	const new_thread = await createThread(name, user_id);
-	const new_rubric = await createRubric(new_thread.id, rubric.criteria, rubric.max_score);
+	const new_rubric = await createRubric(new_thread.id, rubric.criteria, rubric.max_grade);
   return { status: 200, body: { new_rubric, new_thread } };
 	}
 	catch (err) {

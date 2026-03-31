@@ -5,7 +5,7 @@ let _open = false;
 
 export function init(container, thread) {
   _open = false;
-  const total = thread.criteria.reduce((s, c) => s + c.pts, 0);
+  const total = thread.criteria.reduce((s, c) => s + c.max_points, 0);
 
   container.innerHTML = `
     <div class="rubric-panel">
@@ -25,7 +25,7 @@ export function init(container, thread) {
                   <div class="criterion-item__name">${c.name}</div>
                   <div class="criterion-item__desc">${c.desc}</div>
                 </div>
-                <div class="criterion-item__pts">${c.pts} pts</div>
+                <div class="criterion-item__pts">${c.max_points} pts</div>
               </div>
             `).join('')}
           </div>

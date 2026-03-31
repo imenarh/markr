@@ -20,7 +20,7 @@ export function normalizeThread(t) {
     id: t.id,
     name: t.name,
     date: new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    criteria: (t.criteria ?? []).map((c, i) => ({ id: i + 1, name: c.name, desc: c.description, pts: c.max_points })),
+    criteria: (t.criteria ?? []).map((c, i) => ({ id: i + 1, name: c.name, description: c.description, max_points: c.max_points })),
     results: Array(t.result_count ?? 0).fill(null),
   };
 }
@@ -32,8 +32,9 @@ export function normalizeResult(r) {
     id: r.id,
     date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    total: r.score,
-    max: r.grades.reduce((sum, g) => sum + g.max_points, 0),
-    scores: r.grades.map(g => ({ n: g.name, s: g.score, m: g.max_points, fb: g.feedback })),
+    grade: r.grade,
+    max_grade: r.scores.reduce((sum, s) => sum + s.max_points, 0),
+    feedback: r.overall_feedback,
+    scores: r.scores,
   };
 }

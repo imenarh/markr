@@ -30,20 +30,20 @@ export function render(thread) {
   body.innerHTML = [...thread.results].reverse().map(r => `
     <div class="sb-item">
       <div class="sb-item-head" data-rid="${r.id}">
-        <div class="sb-item-score">${r.total} / ${r.max} pts</div>
+        <div class="sb-item-score">${r.grade} / ${r.max_grade} pts</div>
         <div class="sb-item-right">
           <span class="sb-item-date">${r.date} · ${r.time}</span>
-          <span class="sb-item-pct">${Math.round(r.total / r.max * 100)}%</span>
+          <span class="sb-item-pct">${Math.round(r.grade / r.max_grade * 100)}%</span>
         </div>
       </div>
       <div class="sb-detail" id="sbd-${r.id}">
         ${r.scores.map(s => `
           <div class="sb-crit">
             <div class="sb-crit-top">
-              <span class="sb-crit-name">${s.n}</span>
-              <span class="sb-crit-pts">${s.s}/${s.m}</span>
+              <span class="sb-crit-name">${s.name}</span>
+              <span class="sb-crit-pts">${s.points}/${s.max_points}</span>
             </div>
-            <div class="sb-crit-fb">${s.fb}</div>
+            <div class="sb-crit-fb">${s.feedback}</div>
           </div>
         `).join('')}
       </div>

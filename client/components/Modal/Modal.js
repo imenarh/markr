@@ -67,29 +67,44 @@ export function close() {
   $('modal-overlay').classList.remove('open');
 }
 
-function parseRubric() {
+async function parseRubric() {
   const txt = $('rubric-paste').value.trim();
   if (!txt) { alert('Please paste rubric text first.'); return; }
 
-  // Placeholder — will be replaced by POST /api/parse
-  state.parsed = [
-    { name: "Argument Quality", desc: "Clear, well-supported central argument maintained throughout", pts: 20 },
-    { name: "Evidence & Sources", desc: "Credible sources cited and used effectively", pts: 20 },
-    { name: "Structure & Flow", desc: "Logical organization with clear introduction and conclusion", pts: 15 }
-  ];
+  const parseBtn = $('parse-btn');
+  parseBtn.disabled = true;
+  parseBtn.textContent = 'Parsing...';
 
-  $('parsed-list').innerHTML = state.parsed.map(c => `
-    <div class="parsed-criterion">
-      <div class="parsed-criterion__body">
-        <div class="parsed-criterion__name">${c.name}</div>
-        <div class="parsed-criterion__desc">${c.desc}</div>
+  try {
+    const res = await fetch('/api/parse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rubric: txt }),
+    });
+
+    const data = await res.json();
+
+    state.parsed = data.criteria;
+
+    $('parsed-list').innerHTML = state.parsed.map(c => `
+      <div class="parsed-criterion">
+        <div class="parsed-criterion__body">
+          <div class="parsed-criterion__name">${c.name}</div>
+          <div class="parsed-criterion__desc">${c.description}</div>
+        </div>
+        <div class="parsed-criterion__pts">${c.max_points} pts</div>
       </div>
-      <div class="parsed-criterion__pts">${c.pts} pts</div>
-    </div>
-  `).join('');
+    `).join('');
 
-  $('parsed-preview').classList.add('visible');
-  $('confirm-btn').disabled = false;
+    $('parsed-preview').classList.add('visible');
+    $('confirm-btn').disabled = false;
+  } catch (err) {
+    console.error(err);
+    alert('Failed to parse rubric. Please try again.');
+  }
+
+  parseBtn.disabled = false;
+  parseBtn.textContent = 'Parse rubric →';
 }
 
 async function createThread() {
@@ -97,7 +112,7 @@ async function createThread() {
   if (!name) { alert('Please enter a thread name.'); return; }
   if (!state.parsed.length) { alert('Please parse a rubric first.'); return; }
 
-  const maxScore = state.parsed.reduce((sum, c) => sum + c.pts, 0);
+  const maxScore = state.parsed.reduce((sum, c) => sum + (Number(c.max_points) || 0), 0);
 
   const res = await fetch('/api/threads', {
     method: 'POST',
@@ -105,8 +120,8 @@ async function createThread() {
     body: JSON.stringify({
       name,
       rubric: {
-        criteria: state.parsed.map(c => ({ name: c.name, description: c.desc, max_points: c.pts })),
-        max_score: maxScore,
+        criteria: state.parsed,
+        max_grade: maxScore,
       },
     }),
   });
