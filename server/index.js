@@ -57,14 +57,12 @@ const server = http.createServer(async (req, res) => {
   // ── Client-side routes ──
   if (pathname.startsWith('/t/')) {
     const filePath = path.resolve(clientDir, 'thread.html');
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     createReadStream(filePath).pipe(res);
     return;
   }
 
   // ── Static files ──
-  if (req.method !== 'GET') return sendJson(res, 405, { error: 'Method not allowed' });
-
   const relative = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
   const filePath = path.resolve(clientDir, relative);
 
@@ -77,7 +75,7 @@ const server = http.createServer(async (req, res) => {
 
     res.writeHead(200, {
       'Content-Type': MIME_TYPES[path.extname(filePath)] ?? 'application/octet-stream',
-      'Cache-Control': 'no-store',
+      'Cache-Control': 'public, max-age=604800',
     });
     createReadStream(filePath).pipe(res);
   } catch {
