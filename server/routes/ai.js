@@ -29,7 +29,7 @@ ${submission}`;
     const gradeResult = JSON.parse(raw);
 
     // Calculate grade from all criteria points
-    const grade = gradeResult.scores.reduce((sum, c) => sum + c.points, 0);
+    const grade = gradeResult.scores.reduce((sum, c) => sum + Number(c.points), 0);
 
     // Save to DB
     const saved = await createResult(
