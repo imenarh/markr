@@ -2,6 +2,8 @@
 
 A web-based AI grading tool. Paste a rubric, paste a submission, get structured scores and feedback for each criterion — consistent every time.
 
+**Video Url**: https://www.loom.com/share/4469aa8e59114b3081decb5a8cdb9723 
+
 > Built for user who want decent AI-powered submission feedback.
 
 ## How it works
